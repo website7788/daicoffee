@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>DAI Coffee & More</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #6a9a6e;
+    --green-dark: #4a7a4e;
+    --green-light: #a8c5ab;
+    --green-pale: #dceadd;
+    --beige: #f5f0e8;
+    --beige-dark: #e8dfc9;
+    --white: #fdfaf5;
+    --text: #2c2c2c;
+    --text-muted: #7a7060;
+    --radius: 20px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--text); overflow-x: hidden; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(253,250,245,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--beige-dark);
+    display: flex; align-items: center; justify-content: space-between; padding: 12px 20px;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logo img { height: 38px; width: auto; }
+  .nav-links { display: flex; gap: 6px; list-style: none; }
+  .nav-links a { font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; padding: 6px 12px; border-radius: 20px; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.active { background: var(--green-pale); color: var(--green-dark); }
+
+  #home {
+    min-height: 100svh; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 100px 24px 60px;
+    background: linear-gradient(160deg, var(--white) 0%, var(--beige) 50%, var(--green-pale) 100%);
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .hero-bg-circle { position: absolute; border-radius: 50%; opacity: 0.12; }
+  .hero-bg-circle:nth-child(1) { width: 400px; height: 400px; background: var(--green); top: -100px; right: -100px; }
+  .hero-bg-circle:nth-child(2) { width: 250px; height: 250px; background: var(--beige-dark); bottom: -60px; left: -60px; }
+
+  .hero-tag { display: inline-block; background: var(--green-pale); color: var(--green-dark); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; margin-bottom: 20px; animation: fadeUp 0.6s ease both; }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(42px, 12vw, 72px); line-height: 1.05; color: var(--text); margin-bottom: 8px; animation: fadeUp 0.6s 0.1s ease both; }
+  .hero-title em { color: var(--green); font-style: italic; }
+  .hero-subtitle { font-family: 'Caveat', cursive; font-size: clamp(18px, 5vw, 24px); color: var(--text-muted); margin-bottom: 24px; animation: fadeUp 0.6s 0.2s ease both; }
+
+  #cupCanvas { display: block; width: 260px; height: 300px; margin: 0 auto 24px; animation: fadeUp 0.6s 0.3s ease both; cursor: grab; }
+  #cupCanvas:active { cursor: grabbing; }
+
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.6s 0.4s ease both; }
+  .btn-primary { background: var(--green); color: white; padding: 14px 28px; border-radius: 30px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all 0.25s; box-shadow: 0 4px 16px rgba(106,154,110,0.35); }
+  .btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(106,154,110,0.45); }
+  .btn-secondary { background: transparent; color: var(--green-dark); padding: 14px 28px; border-radius: 30px; font-size: 15px; font-weight: 600; text-decoration: none; border: 2px solid var(--green-light); transition: all 0.25s; }
+  .btn-secondary:hover { background: var(--green-pale); transform: translateY(-2px); }
+
+  .scroll-hint { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; animation: bounce 2s ease-in-out infinite; }
+  .scroll-hint::after { content: ''; width: 1px; height: 30px; background: var(--green-light); display: block; }
+  @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+
+  section { padding: 80px 20px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin-bottom: 10px; display: block; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(28px, 7vw, 42px); line-height: 1.15; margin-bottom: 16px; }
+  .section-desc { color: var(--text-muted); font-size: 15px; line-height: 1.7; max-width: 500px; }
+
+  #highlights { background: var(--beige); padding: 50px 20px; }
+  .highlights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 480px; margin: 0 auto; }
+  .highlight-card { background: var(--white); border-radius: var(--radius); padding: 20px 12px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+  .highlight-card .icon { font-size: 28px; margin-bottom: 8px; }
+  .highlight-card strong { display: block; font-size: 13px; font-weight: 600; color: var(--text); }
+  .highlight-card span { font-size: 11px; color: var(--text-muted); }
+
+  #menu { background: var(--white); }
+  .menu-header { text-align: center; margin-bottom: 36px; }
+  .menu-filter { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 28px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .menu-filter::-webkit-scrollbar { display: none; }
+  .filter-btn { background: none; border: 1.5px solid var(--beige-dark); color: var(--text-muted); padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
+  .filter-btn.active, .filter-btn:hover { background: var(--green); border-color: var(--green); color: white; }
+  .menu-category { margin-bottom: 36px; }
+  .category-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--green-dark); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1.5px solid var(--green-pale); display: flex; align-items: center; gap: 8px; }
+  .category-title span { font-size: 18px; }
+  .menu-items { display: flex; flex-direction: column; gap: 2px; }
+  .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 12px; transition: background 0.15s; }
+  .menu-item:hover { background: var(--beige); }
+  .menu-item-name { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
+  .menu-item-sig { font-size: 10px; background: var(--green-pale); color: var(--green-dark); padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-left: 6px; flex-shrink: 0; }
+  .menu-item-price { font-size: 14px; font-weight: 700; color: var(--green-dark); flex-shrink: 0; margin-left: 12px; }
+  .menu-item-price::after { content: ' EGP'; font-size: 10px; font-weight: 400; color: var(--text-muted); }
+
+  #about { background: var(--green-dark); color: white; position: relative; overflow: hidden; }
+  #about::before { content: ''; position: absolute; top: -80px; right: -80px; width: 300px; height: 300px; border-radius: 50%; background: rgba(255,255,255,0.04); }
+  #about::after { content: ''; position: absolute; bottom: -60px; left: -60px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,0.04); }
+  .about-content { position: relative; z-index: 1; max-width: 500px; margin: 0 auto; }
+  #about .section-label { color: var(--green-light); }
+  #about .section-title { color: white; }
+  #about .section-desc { color: rgba(255,255,255,0.75); margin-bottom: 32px; }
+  .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 32px; }
+  .stat-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius); padding: 18px; text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 32px; color: white; display: block; }
+  .stat-label { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .social-links { display: flex; gap: 10px; flex-wrap: wrap; }
+  .social-link { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 10px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.15); }
+  .social-link:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+
+  #contact { background: var(--beige); }
+  .contact-header { text-align: center; margin-bottom: 32px; }
+  .contact-cards { display: flex; flex-direction: column; gap: 14px; max-width: 480px; margin: 0 auto; }
+  .contact-card { background: var(--white); border-radius: var(--radius); padding: 20px; display: flex; align-items: flex-start; gap: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); text-decoration: none; color: var(--text); transition: transform 0.2s, box-shadow 0.2s; }
+  .contact-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+  .contact-icon { width: 44px; height: 44px; background: var(--green-pale); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .contact-info strong { display: block; font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .contact-info span { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+  .whatsapp-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: #25D366; color: white; text-decoration: none; padding: 16px 28px; border-radius: 30px; font-size: 16px; font-weight: 600; margin: 24px auto 0; max-width: 280px; box-shadow: 0 4px 16px rgba(37,211,102,0.3); transition: all 0.25s; }
+  .whatsapp-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(37,211,102,0.45); }
+
+  footer { background: var(--text); color: rgba(255,255,255,0.5); text-align: center; padding: 24px 20px; font-size: 13px; }
+  footer strong { color: rgba(255,255,255,0.85); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  @media (min-width: 640px) {
+    .highlights-grid { max-width: 600px; }
+    .contact-cards { max-width: 560px; }
+    #menu { max-width: 600px; margin: 0 auto; padding-left: 0; padding-right: 0; }
+    section { padding: 100px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#home" class="nav-logo">
+    <img src="https://ugc.production.linktr.ee/ff1ee2ab-035c-43e4-a7e0-570d067336c4_Pic.jpeg" alt="DAI Coffee logo" />
+  </a>
+  <ul class="nav-links">
+    <li><a href="#home" class="active">Home</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section id="home">
+  <div class="hero-bg-circle"></div>
+  <div class="hero-bg-circle"></div>
+  <span class="hero-tag">☕ Alexandria, Egypt</span>
+  <h1 class="hero-title">DAI Coffee<br><em>&amp; More</em></h1>
+  <p class="hero-subtitle">"Coffee is not just a drink… it's a daily ritual."</p>
+  <canvas id="cupCanvas"></canvas>
+  <div class="hero-cta">
+    <a href="#menu" class="btn-primary">View Menu</a>
+    <a href="#contact" class="btn-secondary">Find Us</a>
+  </div>
+  <div class="scroll-hint">Scroll</div>
+</section>
+
+<section id="highlights">
+  <div class="highlights-grid">
+    <div class="highlight-card fade-in">
+      <div class="icon">🎓</div>
+      <strong>Student Friendly</strong>
+      <span>Your campus hangout</span>
+    </div>
+    <div class="highlight-card fade-in">
+      <div class="icon">🌿</div>
+      <strong>Fresh Daily</strong>
+      <span>Made with love</span>
+    </div>
+    <div class="highlight-card fade-in">
+      <div class="icon">⏰</div>
+      <strong>7:30am – 10pm</strong>
+      <span>Open every day</span>
+    </div>
+  </div>
+</section>
+
+<section id="menu">
+  <div class="menu-header fade-in">
+    <span class="section-label">What we serve</span>
+    <h2 class="section-title">Our Menu</h2>
+    <p class="section-desc" style="margin: 0 auto; text-align:center;">All prices in EGP. Signature items are crafted with our own special twist ✨</p>
+  </div>
+  <div class="menu-filter fade-in">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="espresso">Espresso</button>
+    <button class="filter-btn" data-filter="hot">Hot Drinks</button>
+    <button class="filter-btn" data-filter="iced">Iced Coffee</button>
+    <button class="filter-btn" data-filter="frappe">Frappes</button>
+    <button class="filter-btn" data-filter="matcha">Matcha</button>
+    <button class="filter-btn" data-filter="shakes">Shakes</button>
+    <button class="filter-btn" data-filter="mojito">Mojito</button>
+    <button class="filter-btn" data-filter="juice">Fresh Juice</button>
+    <button class="filter-btn" data-filter="smoothie">Smoothies</button>
+    <button class="filter-btn" data-filter="soft">Soft Drinks</button>
+    <button class="filter-btn" data-filter="dessert">Desserts</button>
+    <button class="filter-btn" data-filter="bakery">Bakery</button>
+    <button class="filter-btn" data-filter="extras">Extras</button>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="espresso">
+    <h3 class="category-title"><span>☕</span> Espresso Shots</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Espresso (S)</span><span class="menu-item-price">55</span></div>
+      <div class="menu-item"><span class="menu-item-name">Espresso (D)</span><span class="menu-item-price">65</span></div>
+      <div class="menu-item"><span class="menu-item-name">Espresso Macchiato (S)</span><span class="menu-item-price">65</span></div>
+      <div class="menu-item"><span class="menu-item-name">Espresso Macchiato (D)</span><span class="menu-item-price">75</span></div>
+      <div class="menu-item"><span class="menu-item-name">Espresso Affogato</span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Espresso Con Pana</span><span class="menu-item-price">75</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="hot">
+    <h3 class="category-title"><span>🥛</span> Milky Shots</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Cappuccino</span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Latte</span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Cinnamon Latte</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Salted Caramel Latte</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Flat White</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Americano</span><span class="menu-item-price">70</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mochaccino</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Caramel Macchiato</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">Nescafe</span><span class="menu-item-price">70</span></div>
+      <div class="menu-item"><span class="menu-item-name">Nutella Coffee</span><span class="menu-item-price">75</span></div>
+      <div class="menu-item"><span class="menu-item-name">Classic Cofro</span><span class="menu-item-price">75</span></div>
+      <div class="menu-item"><span class="menu-item-name">Spanish Latte</span><span class="menu-item-price">85</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="hot">
+    <h3 class="category-title"><span>🫖</span> Turkish & French Coffee</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Turkish Coffee</span><span class="menu-item-price">50</span></div>
+      <div class="menu-item"><span class="menu-item-name">Turkish Coffee (D)</span><span class="menu-item-price">60</span></div>
+      <div class="menu-item"><span class="menu-item-name">French Coffee</span><span class="menu-item-price">70</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="hot">
+    <h3 class="category-title"><span>🍵</span> Hot Drinks</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Tea / Flavored Tea</span><span class="menu-item-price">40</span></div>
+      <div class="menu-item"><span class="menu-item-name">Tea with Milk</span><span class="menu-item-price">55</span></div>
+      <div class="menu-item"><span class="menu-item-name">Apple Cider</span><span class="menu-item-price">60</span></div>
+      <div class="menu-item"><span class="menu-item-name">Herbs</span><span class="menu-item-price">50</span></div>
+      <div class="menu-item"><span class="menu-item-name">Herbs DAI <span class="menu-item-sig">SIGNATURE</span></span><span class="menu-item-price">70</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="hot">
+    <h3 class="category-title"><span>🍫</span> Hot Chocolate</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Hot Chocolate</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">White Chocolate</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">DAI Hot Chocolate <span class="menu-item-sig">SIGNATURE</span></span><span class="menu-item-price">95</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="iced">
+    <h3 class="category-title"><span>🧊</span> Iced Coffee</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Iced Spanish Latte</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Iced Salted Caramel Latte</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">Iced Caramel Macchiato</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Iced Cappuccino</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">Iced Latte</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">Iced Mocha</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Iced White Mocha</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Iced Americano</span><span class="menu-item-price">85</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="matcha">
+    <h3 class="category-title"><span>🍵</span> Matcha</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Iced Matcha</span><span class="menu-item-price">110</span></div>
+      <div class="menu-item"><span class="menu-item-name">Iced Matcha Flavored</span><span class="menu-item-price">120</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="frappe">
+    <h3 class="category-title"><span>🥤</span> Coffee Base (Frappe)</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Coffee Frappe</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mocha Frappe</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Caramel Frappe</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">White Mocha Frappe</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Hazelnut Frappe</span><span class="menu-item-price">99</span></div>
+      <div class="menu-item"><span class="menu-item-name">Oreo Frappe</span><span class="menu-item-price">99</span></div>
+      <div class="menu-item"><span class="menu-item-name">Brownies Frappe</span><span class="menu-item-price">110</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="shakes">
+    <h3 class="category-title"><span>🧋</span> Fredo Shake</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">DAI Shake <span class="menu-item-sig">SIGNATURE</span></span><span class="menu-item-price">115</span></div>
+      <div class="menu-item"><span class="menu-item-name">Brownies Shake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Salted Caramel Shake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Blue Berry Shake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mix Berry Shake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Nutella Shake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Lotus Shake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Passion Fruit Shake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Oreo Shake</span><span class="menu-item-price">95</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="shakes">
+    <h3 class="category-title"><span>🍦</span> Milk Shake</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Vanilla Shake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Chocolate Shake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mango Shake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Strawberry Shake</span><span class="menu-item-price">95</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="mojito">
+    <h3 class="category-title"><span>🍋</span> Mojito</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Classic Mojito</span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Blue Dragon Mojito</span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mojito with Topping</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">DAI Mojito <span class="menu-item-sig">SIGNATURE</span></span><span class="menu-item-price">125</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="juice">
+    <h3 class="category-title"><span>🍊</span> Fresh Juice</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Lemonade</span><span class="menu-item-price">70</span></div>
+      <div class="menu-item"><span class="menu-item-name">Pink Lemonade</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Orange</span><span class="menu-item-price">70</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mango</span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Strawberry</span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Guava</span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Pomegranate</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Date</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Kiwi</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Watermelon</span><span class="menu-item-price">80</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="smoothie">
+    <h3 class="category-title"><span>🫐</span> Smoothies</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Mango</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mango Passion</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mango Beach</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mango Mint</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">Strawberry</span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Strawberry Passion</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Water Melon</span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Lemon Mint</span><span class="menu-item-price">80</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="soft">
+    <h3 class="category-title"><span>🥤</span> Soft Drink & Cocktail</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Red Bull</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mineral Water</span><span class="menu-item-price">15</span></div>
+      <div class="menu-item"><span class="menu-item-name">DAI Power <span class="menu-item-sig">SIGNATURE</span></span><span class="menu-item-price">80</span></div>
+      <div class="menu-item"><span class="menu-item-name">Cherry Cola</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Sun Shine</span><span class="menu-item-price">80</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="dessert">
+    <h3 class="category-title"><span>🍮</span> Dessert</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Brownies</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">Molten Cake</span><span class="menu-item-price">90</span></div>
+      <div class="menu-item"><span class="menu-item-name">Cheese Cake</span><span class="menu-item-price">95</span></div>
+      <div class="menu-item"><span class="menu-item-name">Waffle</span><span class="menu-item-price">90</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="bakery">
+    <h3 class="category-title"><span>🥐</span> Bakery</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Plain Croissant</span><span class="menu-item-price">70</span></div>
+      <div class="menu-item"><span class="menu-item-name">Chocolate Croissant</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Lotus Croissant</span><span class="menu-item-price">85</span></div>
+      <div class="menu-item"><span class="menu-item-name">Smoked Turkey Croissant</span><span class="menu-item-price">100</span></div>
+      <div class="menu-item"><span class="menu-item-name">Mix Cheese Croissant</span><span class="menu-item-price">100</span></div>
+    </div>
+  </div>
+
+  <div class="menu-category fade-in" data-cat="extras">
+    <h3 class="category-title"><span>✨</span> Extras / Add-ons</h3>
+    <div class="menu-items">
+      <div class="menu-item"><span class="menu-item-name">Sauce / Flavor</span><span class="menu-item-price">20</span></div>
+      <div class="menu-item"><span class="menu-item-name">Coffee Shot</span><span class="menu-item-price">25</span></div>
+      <div class="menu-item"><span class="menu-item-name">Whipped Cream</span><span class="menu-item-price">25</span></div>
+      <div class="menu-item"><span class="menu-item-name">Milk</span><span class="menu-item-price">20</span></div>
+      <div class="menu-item"><span class="menu-item-name">Honey</span><span class="menu-item-price">15</span></div>
+      <div class="menu-item"><span class="menu-item-name">Ice Cream</span><span class="menu-item-price">25</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="about-content">
+    <span class="section-label">Our story</span>
+    <h2 class="section-title">More than just<br>a coffee spot</h2>
+    <p class="section-desc">DAI Coffee & More is your go-to daily ritual spot in Alexandria. Whether you're cramming before an exam, catching up with friends, or just need that morning hit — we've got you. Student-friendly prices, immaculate vibes.</p>
+    <div class="about-stats" style="margin-top:28px;">
+      <div class="stat-card fade-in"><span class="stat-num">🎓</span><span class="stat-label">Student-friendly spot</span></div>
+      <div class="stat-card fade-in"><span class="stat-num">60+</span><span class="stat-label">Items on the menu</span></div>
+      <div class="stat-card fade-in"><span class="stat-num">7:30</span><span class="stat-label">We open early for you</span></div>
+      <div class="stat-card fade-in"><span class="stat-num">☕</span><span class="stat-label">Daily ritual, guaranteed</span></div>
+    </div>
+    <div class="social-links">
+      <a href="https://www.instagram.com/daicoffeeegy" target="_blank" class="social-link">📸 Instagram</a>
+      <a href="https://www.facebook.com/people/Dai-Coffee-More/61583876690902/" target="_blank" class="social-link">👍 Facebook</a>
+      <a href="https://www.tiktok.com/@dai.cafe.eg" target="_blank" class="social-link">🎵 TikTok</a>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact-header fade-in">
+    <span class="section-label">Come find us</span>
+    <h2 class="section-title">Visit DAI Coffee</h2>
+  </div>
+  <div class="contact-cards">
+    <a href="https://maps.app.goo.gl/cgooNjYvj8QBwNMc7" target="_blank" class="contact-card fade-in">
+      <div class="contact-icon">📍</div>
+      <div class="contact-info">
+        <strong>Location</strong>
+        <span>Alexandria, Egypt<br><span style="color:var(--green-dark); font-weight:600;">Tap to open in Maps →</span></span>
+      </div>
+    </a>
+    <div class="contact-card fade-in">
+      <div class="contact-icon">🕐</div>
+      <div class="contact-info">
+        <strong>Opening Hours</strong>
+        <span>Every day<br>7:30 AM – 10:00 PM</span>
+      </div>
+    </div>
+    <a href="https://wa.me/201515458619" target="_blank" class="contact-card fade-in">
+      <div class="contact-icon">💬</div>
+      <div class="contact-info">
+        <strong>WhatsApp</strong>
+        <span>+20 151 545 8619<br><span style="color:var(--green-dark); font-weight:600;">Chat with us →</span></span>
+      </div>
+    </a>
+  </div>
+  <a href="https://wa.me/201515458619" target="_blank" class="whatsapp-btn fade-in">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Order on WhatsApp
+  </a>
+</section>
+
+<footer>
+  <p><strong>DAI Coffee & More</strong> · Alexandria, Egypt</p>
+  <p style="margin-top:6px;">☕ Coffee is not just a drink… it's a daily ritual.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function() {
+  const canvas = document.getElementById('cupCanvas');
+  const W = 260, H = 300;
+  canvas.width = W * window.devicePixelRatio;
+  canvas.height = H * window.devicePixelRatio;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(W, H);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 100);
+  camera.position.set(0, 0.4, 5.5);
+  camera.lookAt(0, 0, 0);
+
+  // Lights
+  const ambient = new THREE.AmbientLight(0xfff8f0, 0.55);
+  scene.add(ambient);
+
+  const keyLight = new THREE.DirectionalLight(0xfff5e8, 1.4);
+  keyLight.position.set(3, 5, 4);
+  keyLight.castShadow = true;
+  scene.add(keyLight);
+
+  const fillLight = new THREE.DirectionalLight(0xe8f0e8, 0.5);
+  fillLight.position.set(-3, 2, 2);
+  scene.add(fillLight);
+
+  const rimLight = new THREE.DirectionalLight(0xffffff, 0.3);
+  rimLight.position.set(0, -2, -4);
+  scene.add(rimLight);
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  // ── Cup body (LatheGeometry - tapered cylinder, wider at top) ──
+  const bodyPts = [];
+  const segments = 40;
+  const cupH = 2.2;
+  const rTop = 0.82, rBot = 0.62;
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const y = -cupH / 2 + t * cupH;
+    const r = rBot + (rTop - rBot) * t;
+    bodyPts.push(new THREE.Vector2(r, y));
+  }
+  const bodyGeo = new THREE.LatheGeometry(bodyPts, 64);
+
+  // White paper material
+  const bodyMat = new THREE.MeshStandardMaterial({
+    color: 0xfaf7f2,
+    roughness: 0.75,
+    metalness: 0.0,
+  });
+  const cupBody = new THREE.Mesh(bodyGeo, bodyMat);
+  cupBody.castShadow = true;
+  group.add(cupBody);
+
+  // ── Kraft sleeve (LatheGeometry - band in middle) ──
+  const sleeveY1 = -0.05, sleeveY2 = 0.75;
+  const sleevePts = [];
+  for (let i = 0; i <= 20; i++) {
+    const t = i / 20;
+    const y = sleeveY1 + t * (sleeveY2 - sleeveY1);
+    const tCup = (y + cupH / 2) / cupH;
+    const r = (rBot + (rTop - rBot) * tCup) + 0.015;
+    sleevePts.push(new THREE.Vector2(r, y));
+  }
+  const sleeveGeo = new THREE.LatheGeometry(sleevePts, 64);
+  const sleeveMat = new THREE.MeshStandardMaterial({
+    color: 0xb5874a,
+    roughness: 0.88,
+    metalness: 0.0,
+  });
+  const sleeve = new THREE.Mesh(sleeveGeo, sleeveMat);
+  sleeve.castShadow = true;
+  group.add(sleeve);
+
+  // ── Lid (flat disc + rim ring + dome) ──
+  const lidY = cupH / 2;
+  const lidR = rTop + 0.06;
+
+  // Lid flat top disc
+  const lidGeo = new THREE.CylinderGeometry(lidR, lidR, 0.06, 64);
+  const lidMat = new THREE.MeshStandardMaterial({
+    color: 0x1e1e1e,
+    roughness: 0.3,
+    metalness: 0.15,
+  });
+  const lid = new THREE.Mesh(lidGeo, lidMat);
+  lid.position.y = lidY + 0.03;
+  lid.castShadow = true;
+  group.add(lid);
+
+  // Lid rim (slightly wider ring)
+  const rimGeo = new THREE.TorusGeometry(lidR, 0.055, 12, 64);
+  const rimMat = new THREE.MeshStandardMaterial({ color: 0x252525, roughness: 0.35, metalness: 0.1 });
+  const rim = new THREE.Mesh(rimGeo, rimMat);
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = lidY;
+  group.add(rim);
+
+  // Lid dome (small raised dome on top)
+  const domePts = [];
+  for (let i = 0; i <= 12; i++) {
+    const t = i / 12;
+    const angle = t * Math.PI * 0.5;
+    domePts.push(new THREE.Vector2(Math.cos(angle) * 0.32, Math.sin(angle) * 0.14));
+  }
+  const domeGeo = new THREE.LatheGeometry(domePts, 48);
+  const domeMat = new THREE.MeshStandardMaterial({ color: 0x282828, roughness: 0.28, metalness: 0.12 });
+  const dome = new THREE.Mesh(domeGeo, domeMat);
+  dome.position.y = lidY + 0.06;
+  group.add(dome);
+
+  // Drink hole (dark indent slot)
+  const holeGeo = new THREE.BoxGeometry(0.28, 0.04, 0.1);
+  const holeMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.9 });
+  const hole = new THREE.Mesh(holeGeo, holeMat);
+  hole.position.set(0.28, lidY + 0.07, 0);
+  group.add(hole);
+
+  // ── Base ring ──
+  const baseGeo = new THREE.CylinderGeometry(rBot + 0.02, rBot - 0.02, 0.08, 64);
+  const baseMat = new THREE.MeshStandardMaterial({ color: 0xe0dbd2, roughness: 0.8, metalness: 0.0 });
+  const base = new THREE.Mesh(baseGeo, baseMat);
+  base.position.y = -cupH / 2 + 0.04;
+  group.add(base);
+
+  // ── Subtle green stripe branding on sleeve ──
+  const stripeGeo = new THREE.TorusGeometry(rBot + (rTop-rBot)*0.3 + 0.032, 0.012, 8, 64);
+  const stripeMat = new THREE.MeshStandardMaterial({ color: 0x6a9a6e, roughness: 0.6, metalness: 0.0 });
+  const stripe1 = new THREE.Mesh(stripeGeo, stripeMat);
+  stripe1.rotation.x = Math.PI / 2;
+  stripe1.position.y = sleeveY1 + 0.06;
+  group.add(stripe1);
+  const stripe2 = stripe1.clone();
+  stripe2.position.y = sleeveY2 - 0.06;
+  stripe2.geometry = new THREE.TorusGeometry(rBot + (rTop-rBot)*0.55 + 0.032, 0.012, 8, 64);
+  group.add(stripe2);
+
+  // Slight initial tilt for nice angle
+  group.rotation.x = 0.08;
+
+  // Auto-rotate
+  let autoRotY = 0;
+  let isDragging = false, lastX = 0;
+
+  canvas.addEventListener('mousedown', e => { isDragging = true; lastX = e.clientX; });
+  canvas.addEventListener('touchstart', e => { isDragging = true; lastX = e.touches[0].clientX; }, { passive: true });
+  window.addEventListener('mouseup', () => { isDragging = false; });
+  window.addEventListener('touchend', () => { isDragging = false; });
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    autoRotY += (e.clientX - lastX) * 0.012;
+    lastX = e.clientX;
+  });
+  window.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    autoRotY += (e.touches[0].clientX - lastX) * 0.012;
+    lastX = e.touches[0].clientX;
+  }, { passive: true });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (!isDragging) autoRotY += 0.008;
+    group.rotation.y = autoRotY;
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+</script>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const categories = document.querySelectorAll('.menu-category');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      categories.forEach(cat => {
+        cat.style.display = (filter === 'all' || cat.dataset.cat === filter) ? 'block' : 'none';
+      });
+    });
+  });
+
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+    navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+  }, { passive: true });
+</script>
+</body>
+</html>
